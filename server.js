@@ -7,7 +7,7 @@ var mongoose = require('mongoose');
 var url = 'mongodb://localhost:27017/listophe';
 mongoose.connect(url);
 
-var List = mongoose.model('List', {id: Number, name: String, url: String, rows: [{id: Number, text: String, checked: Boolean}]});
+var List = mongoose.model('List', {name: String, url: String, rows: [{text: String, checked: Boolean}]});
 var testList = new List({
     name: 'TestList',
     url: 'url',
