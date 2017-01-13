@@ -2,11 +2,41 @@ var express = require('express'),
     app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var mongoose = require('mongoose');
+
+var url = 'mongodb://localhost:27017/listophe';
+mongoose.connect(url);
+
+var List = mongoose.model('List', {id: Number, name: String, url: String, rows: [{id: Number, text: String, checked: Boolean}]});
+var testList = new List({
+    name: 'TestList',
+    url: 'url',
+    rows: [
+        {
+            id: 1,
+            text: 'First row',
+            checked: false
+        },
+        {
+            id: 2,
+            text: 'Second row',
+            checked: true
+        }
+    ]
+});
+
+testList.save(function (err, listObj) {
+    if (err) {
+        console.log(err);
+    } else {
+        console.log('saved successfully:', listObj);
+    }
+});
 
 app.use(express.static(__dirname + '/'));
 
 app.get('/:id', function (req, res) {
-    var listId = parseInt(req.params.id);
+    var listId = req.params.id;
     console.log('GET REQ: ' + listId);
     var data = {};
     for (var i = 0, len = lists.length; i < len; i++) {
@@ -21,7 +51,7 @@ app.get('/:id', function (req, res) {
 
 //Delete a list
 app.delete('/:listId', function (req, res) {
-    var listId = parseInt(req.params.listId);
+    var listId = req.params.listId;
     var data = {
         status: false
     };
@@ -42,7 +72,7 @@ app.delete('/:listId', function (req, res) {
 
 //Delete a row from list:
 app.delete('/:listId/:id', function (req, res) {
-    var listId = parseInt(req.params.listId);
+    var listId = req.params.listId;
     var id = parseInt(req.params.id);
     var data = {
         status: false
@@ -120,10 +150,10 @@ function emitToUsers(listId, funcName, params) {
 };
 
 function createNewList(listName) {
-    var lId = lists.length;
+    var lId = listName;
     console.log('Creating new list with id: ' + lId);
     lists.push({
-        listId: lId,
+        listId: listName,
         url: 'default2',
         name: listName,
         list: []
@@ -133,7 +163,6 @@ function createNewList(listName) {
 
 function addRow(listId, r) {
     var rowId = -1;
-    listId = parseInt(listId);
     for (var i = 0, len = lists.length; i < len; i++) {
         if (lists[i].listId === listId) {
             rowId = parseInt(lists[i].list.length);
@@ -170,8 +199,7 @@ function deleteRow(listId, id) {
 };
 
 function updateRow(listId, i, r, c) {
-    listId = parseInt(listId);
-    id = parseInt(i);
+    /*id = parseInt(i);
     data = {
         id: i,
         row: r,
@@ -179,7 +207,7 @@ function updateRow(listId, i, r, c) {
     };
 
     lists[listId].list[i] = data;
-    /*
+    */
     for (var x=0 , len=lists.length; x < len; x++) {
         if (lists[x].listId === listId){
             for (var j=0, len2 = lists[x].list.length; j<len2; j++){
@@ -191,16 +219,16 @@ function updateRow(listId, i, r, c) {
                         checked: c
                     };
                     lists[x].list[j] = data;
-                    data = { status: true};
                     break;    
                 }
             }
         }
-    } */
+    } 
     return data;
 };
 
 //TODO Refactor this to a Database.
+/*
 var lists = [
     {
         listId: 0,
@@ -242,3 +270,4 @@ var lists = [
 			}
 		]
 	}];
+*/
