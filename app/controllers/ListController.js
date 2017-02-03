@@ -22,8 +22,8 @@
         
         init();
         
-        socket.on('newRow', function(i, r){
-            addRow(i, r);  
+        socket.on('newRow', function(r){
+            addRow(r);  
         });
         
         socket.on('updateRow', function(i, r, c){
@@ -32,12 +32,8 @@
             $scope.$apply();
         });
         
-		function addRow(i, r) {
-            $scope.list.push({
-                id: i,
-                row: r,
-                checked: false
-            });
+		function addRow(r) {
+            $scope.list.push(r);
             $scope.$apply();
             //TODO Scroll to bottom. 
             //angular.element("#list-div")[0].scrollBottom=0;

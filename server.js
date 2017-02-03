@@ -2,51 +2,20 @@ var express = require('express'),
     app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var mongoose = require('mongoose');
+var databaseController = require('./backend/Database.js')();
 
-var url = 'mongodb://localhost:27017/listophe';
-mongoose.connect(url);
-
-var List = mongoose.model('List', {name: String, url: String, rows: [{text: String, checked: Boolean}]});
-var testList = new List({
-    name: 'TestList',
-    url: 'url',
-    rows: [
-        {
-            id: 1,
-            text: 'First row',
-            checked: false
-        },
-        {
-            id: 2,
-            text: 'Second row',
-            checked: true
-        }
-    ]
-});
-
-testList.save(function (err, listObj) {
-    if (err) {
-        console.log(err);
-    } else {
-        console.log('saved successfully:', listObj);
-    }
-});
+databaseController.createList("TEST", (list) => (console.log('Callback:', list)));
 
 app.use(express.static(__dirname + '/'));
 
 app.get('/:id', function (req, res) {
     var listId = req.params.id;
-    console.log('GET REQ: ' + listId);
-    var data = {};
-    for (var i = 0, len = lists.length; i < len; i++) {
-        if (lists[i].listId === listId) {
-            data = lists[i];
-            console.log('GET list :' + i);
-            break;
-        }
+    if (listId !== 'favicon.ico') {
+        console.log('GET REQ: ' + listId);
+        var data = {};
+        data = databaseController.getList(listId);
+        res.json(data);
     }
-    res.json(data);
 });
 
 //Delete a list
@@ -113,21 +82,15 @@ io.on('connection', function (socket) {
     });
     socket.on('addRow', function (listId, row) {
         var rowId = addRow(listId, row);
-        console.log('Added row with id: ' + rowId);
+        /*console.log('Added row with id: ' + rowId);
         if (rowId !== -1) {
             //TEST 
             io.to(listId).emit('newRow', rowId, row);
-            /*
-            for (var i = 0, len = lists[listId].participants.length; i < len; i++) {
-                //io.emit('newRow', rowId, row);
-                var socketId= lists[listId].participants[i].socket;
-                io.sockets.socket(socketId).emit('newRow', rowId, row);
-            }*/
         }
+        */
     });
     socket.on('createNewList', function (listName) {
-        var data = createNewList(listName);
-        io.to(socket.id).emit('createdNewList', data);
+        createNewList(listName, socket);
     });
     socket.on('rowChecked', function (listId, id, row, checked) {
         console.log('RowChecked: ID: ' + id + ' content:  ' + row + ' Checked:  ' + checked);
@@ -145,24 +108,13 @@ http.listen(8080, function () {
 
 /*================ Helper functions ====================== */
 
-function emitToUsers(listId, funcName, params) {
-
-};
-
-function createNewList(listName) {
-    var lId = listName;
-    console.log('Creating new list with id: ' + lId);
-    lists.push({
-        listId: listName,
-        url: 'default2',
-        name: listName,
-        list: []
-    });
-    return lId;
+function createNewList(listName, socket) {
+    databaseController.createList(listName, (list) => (io.to(socket.id).emit('createdNewList', list.id)));
 }
 
 function addRow(listId, r) {
-    var rowId = -1;
+    databaseController.addRow(listId, r, (row) => (io.to(listId).emit('newRow', row)));
+    /*var rowId = -1;
     for (var i = 0, len = lists.length; i < len; i++) {
         if (lists[i].listId === listId) {
             rowId = parseInt(lists[i].list.length);
@@ -173,7 +125,7 @@ function addRow(listId, r) {
             });
         }
     }
-    return rowId;
+    return rowId;*/
 };
 
 
@@ -226,48 +178,3 @@ function updateRow(listId, i, r, c) {
     } 
     return data;
 };
-
-//TODO Refactor this to a Database.
-/*
-var lists = [
-    {
-        listId: 0,
-        url: 'none',
-        name: 'empty',
-        list: []
-    },
-    {
-        listId: 1,
-        url: 'default',
-        name: 'Default List!',
-        list: [
-            {
-                id: 0,
-                row: 'Create this list',
-                checked: true
-			},
-            {
-                id: 1,
-                row: 'Create another list',
-                checked: false
-			}
-		]
-	},
-    {
-        listId: 2,
-        url: 'default2',
-        name: '2222',
-        list: [
-            {
-                id: 0,
-                row: 'Create this list',
-                checked: true
-			},
-            {
-                id: 1,
-                row: 'Create another list',
-                checked: false
-			}
-		]
-	}];
-*/
