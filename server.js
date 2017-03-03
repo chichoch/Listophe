@@ -12,9 +12,7 @@ app.get('/:id', function (req, res) {
     var listId = req.params.id;
     if (listId !== 'favicon.ico') {
         console.log('GET REQ: ' + listId);
-        var data = {};
-        data = databaseController.getList(listId);
-        res.json(data);
+        databaseController.getList(listId, (data) => (res.json(data)));
     }
 });
 

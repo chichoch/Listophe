@@ -12,7 +12,8 @@
 		function init() {
             listFactory.getRows(listId)
                 .then(function(response) {
-                    $scope.list = response.data.list;
+                    console.log("LIST: ", response.data.rows);
+                    $scope.list = response.data.rows;
                     $scope.listName = response.data.name;
                     socket.emit('OpenList', listId);
                 }, function(data, status, headers, config) {
