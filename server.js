@@ -91,10 +91,8 @@ io.on('connection', function (socket) {
         createNewList(listName, socket);
     });
     socket.on('rowChecked', function (listId, id, row, checked) {
-        console.log('RowChecked: ID: ' + id + ' content:  ' + row + ' Checked:  ' + checked);
-        var data = updateRow(listId, id, row, checked = !checked);
-        console.log('RowUPDATED: ID: ' + data.id + ' content:  ' + data.row + ' Checked:  ' + data.checked);
-        io.to(listId).emit('updateRow', data.id, data.row, data.checked);
+        console.log("ROW CHECKED");
+        updateRow(listId, id, row, checked);
     });
 });
 
@@ -112,21 +110,13 @@ function createNewList(listName, socket) {
 
 function addRow(listId, r) {
     databaseController.addRow(listId, r, (row) => (io.to(listId).emit('newRow', row)));
-    /*var rowId = -1;
-    for (var i = 0, len = lists.length; i < len; i++) {
-        if (lists[i].listId === listId) {
-            rowId = parseInt(lists[i].list.length);
-            lists[i].list.push({
-                id: rowId,
-                row: r,
-                checked: false
-            });
-        }
-    }
-    return rowId;*/
 };
 
+function updateRow(listId, rowId, text, checked) {
+    databaseController.updateRow(listId, rowId, text, checked, (row) => (io.to(listId).emit('updateRow', rowId, text, checked)));
+};
 
+/*
 function deleteRow(listId, id) {
     var data = {
         status: false
@@ -147,32 +137,5 @@ function deleteRow(listId, id) {
     }
     return data;
 };
+*/
 
-function updateRow(listId, i, r, c) {
-    /*id = parseInt(i);
-    data = {
-        id: i,
-        row: r,
-        checked: c
-    };
-
-    lists[listId].list[i] = data;
-    */
-    for (var x=0 , len=lists.length; x < len; x++) {
-        if (lists[x].listId === listId){
-            for (var j=0, len2 = lists[x].list.length; j<len2; j++){
-                if (lists[x].list[j].id === i) {
-                    console.log('updated Row: "' + lists[x].list[j].row + ' " From list with ID: ' + listId);
-                    data = {
-                        id: i,
-                        row: r,
-                        checked: c
-                    };
-                    lists[x].list[j] = data;
-                    break;    
-                }
-            }
-        }
-    } 
-    return data;
-};

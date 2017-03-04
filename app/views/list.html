@@ -6,7 +6,7 @@
 		<table class="table">
 			<tr ng-repeat="r in list">
 				<td class="text-center">
-                    <div ng-click="checkRow(r.id)" for="{{$index}}" class="checked-{{r.checked}}">
+                    <div ng-click="checkRow(r._id)" for="{{$index}}" class="checked-{{r.checked}}">
 					 {{r.text}} </div>
 					
 				</td>
@@ -24,7 +24,7 @@
         <br/>
 	</div>
 	
-	<!-- FOR DEBUGGING: list={{list}} -->
+	FOR DEBUGGING: list={{list}}
 </div>
 <footer class="footer">	
     <br/>

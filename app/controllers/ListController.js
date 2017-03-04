@@ -27,10 +27,16 @@
             addRow(r);  
         });
         
-        socket.on('updateRow', function(i, r, c){
-            $scope.list[i].row = r;
-            $scope.list[i].checked = c;
-            $scope.$apply();
+        socket.on('updateRow', function(id, text, checked){
+            for (var i = 0, len = $scope.list.length; i < len; i ++) {
+                if ($scope.list[i]._id == id) {
+                    console.log("Updated row:", id, !checked);
+                    $scope.list[i].text = text;
+                    $scope.list[i].checked = !checked;
+                    $scope.$apply();
+                    break;
+                }
+            }
         });
         
 		function addRow(r) {
@@ -45,8 +51,9 @@
         $scope.checkRow = function(id) {
             // listId, id, row, checked
             for (var i=0,len=$scope.list.length;i<len;i++){
-               if ($scope.list[i].id === id){
-                   socket.emit('rowChecked', listId, id, $scope.list[i].row, $scope.list[i].checked);
+               if ($scope.list[i]._id === id){
+                   console.log('Checked row with id: ', id);
+                   socket.emit('rowChecked', listId, id, $scope.list[i].text, $scope.list[i].checked);
                    break;
                }
            } 
