@@ -1,0 +1,28 @@
+{
+  "name": "listophe",
+  "version": "0.0.1",
+  "description": "Simple Webapp for sharing lists",
+  "main": "server.js",
+  "dependencies": {
+    "angular": "^1.7.5",
+    "express": "^4.16.4",
+    "mongodb": "2.2.36",
+    "mongoose": "^5.3.13",
+    "socket.io": "^2.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chichoch/Listophe.git"
+  },
+  "author": "Christophe van Baalen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chichoch/Listophe/issues"
+  },
+  "homepage": "https://github.com/chichoch/Listophe#readme"
+}
