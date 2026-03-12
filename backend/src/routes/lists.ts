@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   addRow,
   createList,
+  deleteList,
   deleteRow,
   getList,
   reorderRows,
@@ -36,6 +37,15 @@ router.post("/", (req, res) => {
 
   const list = createList(parsed.data.name);
   return res.status(201).json({ list });
+});
+
+router.delete("/:listId", (req, res) => {
+  const removed = deleteList(req.params.listId);
+  if (!removed) {
+    return res.status(404).json({ error: "List not found" });
+  }
+
+  return res.status(204).send();
 });
 
 router.get("/:listId", (req, res) => {

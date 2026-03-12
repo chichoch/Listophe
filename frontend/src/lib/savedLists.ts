@@ -2,6 +2,7 @@ export type SavedList = {
   id: string;
   name: string;
   savedAt: string;
+  creator?: boolean;
 };
 
 const STORAGE_KEY = "listophe:saved-lists";
@@ -25,10 +26,10 @@ export function getSavedLists(): SavedList[] {
   );
 }
 
-export function saveList(id: string, name: string): void {
+export function saveList(id: string, name: string, creator = false): void {
   const lists = readAll();
   if (lists.some((l) => l.id === id)) return;
-  lists.push({ id, name, savedAt: new Date().toISOString() });
+  lists.push({ id, name, savedAt: new Date().toISOString(), creator });
   writeAll(lists);
 }
 
@@ -38,4 +39,8 @@ export function removeList(id: string): void {
 
 export function isListSaved(id: string): boolean {
   return readAll().some((l) => l.id === id);
+}
+
+export function isListCreator(id: string): boolean {
+  return readAll().some((l) => l.id === id && l.creator === true);
 }

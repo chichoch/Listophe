@@ -50,6 +50,16 @@ export function createList(name: string): ListWithRows {
   };
 }
 
+export function deleteList(listId: string): boolean {
+  const existing = db.select({ id: lists.id }).from(lists).where(eq(lists.id, listId)).limit(1).get();
+  if (!existing) {
+    return false;
+  }
+
+  db.delete(lists).where(eq(lists.id, listId)).run();
+  return true;
+}
+
 export function listExists(listId: string): boolean {
   const list = db.select({ id: lists.id }).from(lists).where(eq(lists.id, listId)).limit(1).get();
   return Boolean(list);

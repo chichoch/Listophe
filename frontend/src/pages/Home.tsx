@@ -11,7 +11,7 @@ export function HomePage() {
   const createListMutation = useMutation({
     mutationFn: (name: string) => createList(name),
     onSuccess: (list) => {
-      saveList(list.id, list.name);
+      saveList(list.id, list.name, true);
       navigate(`/lists/${list.id}`);
     },
   });

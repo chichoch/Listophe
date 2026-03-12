@@ -1,12 +1,20 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import { getSavedLists, removeList, type SavedList } from "../lib/savedLists";
+import { deleteList } from "../lib/api";
+import { getSavedLists, isListCreator, removeList, type SavedList } from "../lib/savedLists";
 
 export function MyListsPage() {
   const [lists, setLists] = useState<SavedList[]>(getSavedLists);
 
   function handleRemove(id: string) {
+    removeList(id);
+    setLists(getSavedLists());
+  }
+
+  async function handleDelete(id: string) {
+    if (!window.confirm("Are you sure you want to permanently delete this list? This cannot be undone.")) return;
+    await deleteList(id);
     removeList(id);
     setLists(getSavedLists());
   }
@@ -38,13 +46,23 @@ export function MyListsPage() {
               >
                 {list.name}
               </Link>
-              <button
-                type="button"
-                onClick={() => handleRemove(list.id)}
-                className="ml-3 shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-rose-50 hover:text-rose-600"
-              >
-                Remove
-              </button>
+              {isListCreator(list.id) ? (
+                <button
+                  type="button"
+                  onClick={() => handleDelete(list.id)}
+                  className="ml-3 shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 hover:text-rose-700"
+                >
+                  Delete
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handleRemove(list.id)}
+                  className="ml-3 shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-rose-50 hover:text-rose-600"
+                >
+                  Remove
+                </button>
+              )}
             </li>
           ))}
         </ul>

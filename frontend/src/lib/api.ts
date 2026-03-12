@@ -44,3 +44,7 @@ export async function fetchList(listId: string): Promise<List> {
   const data = await request<{ list: List }>(`/api/lists/${listId}`);
   return data.list;
 }
+
+export async function deleteList(listId: string): Promise<void> {
+  await request(`/api/lists/${listId}`, { method: "DELETE" });
+}

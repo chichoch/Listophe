@@ -1,19 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 
-import { isListSaved, removeList, saveList } from "../lib/savedLists";
+import { deleteList } from "../lib/api";
+import { isListCreator, isListSaved, removeList, saveList } from "../lib/savedLists";
 import type { List } from "../types";
 
 export function HamburgerMenu() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
-  const params = useParams<{ listId: string }>();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const listId = location.pathname.startsWith("/lists/") ? params.listId : undefined;
+  const listMatch = location.pathname.match(/^\/lists\/([^/]+)/);
+  const listId = listMatch?.[1];
   const [saved, setSaved] = useState(() => (listId ? isListSaved(listId) : false));
+  const [creator, setCreator] = useState(() => (listId ? isListCreator(listId) : false));
   const [copied, setCopied] = useState(false);
 
   const handleShare = useCallback(() => {
@@ -25,9 +28,10 @@ export function HamburgerMenu() {
     setOpen(false);
   }, [listId]);
 
-  // Sync saved state when navigating to a different list
+  // Sync saved/creator state when navigating to a different list
   useEffect(() => {
     setSaved(listId ? isListSaved(listId) : false);
+    setCreator(listId ? isListCreator(listId) : false);
   }, [listId]);
 
   // Close on route change
@@ -61,6 +65,17 @@ export function HamburgerMenu() {
       setSaved(true);
     }
     setOpen(false);
+  }
+
+  async function handleDeleteList() {
+    if (!listId) return;
+    if (!window.confirm("Are you sure you want to permanently delete this list? This cannot be undone.")) return;
+
+    await deleteList(listId);
+    removeList(listId);
+    queryClient.removeQueries({ queryKey: ["list", listId] });
+    setOpen(false);
+    navigate("/");
   }
 
   return (
@@ -102,13 +117,23 @@ export function HamburgerMenu() {
               >
                 {copied ? "Copied!" : "Share list"}
               </button>
-              <button
-                type="button"
-                onClick={handleToggleSave}
-                className="w-full px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-700"
-              >
-                {saved ? "Remove from My Lists" : "Save to My Lists"}
-              </button>
+              {creator ? (
+                <button
+                  type="button"
+                  onClick={handleDeleteList}
+                  className="w-full px-4 py-2.5 text-left text-sm font-medium text-rose-600 hover:bg-rose-50 hover:text-rose-700"
+                >
+                  Delete list
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleToggleSave}
+                  className="w-full px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-700"
+                >
+                  {saved ? "Remove from My Lists" : "Save to My Lists"}
+                </button>
+              )}
             </>
           )}
         </div>
