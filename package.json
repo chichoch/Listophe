@@ -1,28 +1,24 @@
 {
   "name": "listophe",
-  "version": "0.0.1",
-  "description": "Simple Webapp for sharing lists",
-  "main": "server.js",
-  "dependencies": {
-    "angular": "^1.7.5",
-    "express": "^4.16.4",
-    "mongodb": "2.2.36",
-    "mongoose": "^5.3.13",
-    "socket.io": "^2.1.1"
-  },
-  "devDependencies": {},
+  "version": "1.0.0",
+  "private": true,
+  "description": "Modern real-time collaborative list sharing app",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "dev": "concurrently -n backend,frontend -c cyan,magenta \"npm run dev --workspace backend\" \"npm run dev --workspace frontend\"",
+    "build": "npm run build --workspace frontend && npm run build --workspace backend",
+    "start": "npm run start --workspace backend",
+    "db:migrate": "npm run db:migrate --workspace backend",
+    "db:generate": "npm run db:generate --workspace backend",
+    "typecheck": "npm run typecheck --workspace frontend && npm run typecheck --workspace backend"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/chichoch/Listophe.git"
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   },
-  "author": "Christophe van Baalen",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/chichoch/Listophe/issues"
-  },
-  "homepage": "https://github.com/chichoch/Listophe#readme"
+  "engines": {
+    "node": ">=22"
+  }
 }
