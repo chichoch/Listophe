@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 
@@ -9,7 +9,6 @@ import { fetchList } from "../lib/api";
 export function ListPage() {
   const { listId } = useParams<{ listId: string }>();
   const queryClient = useQueryClient();
-  const [copied, setCopied] = useState(false);
 
   const refreshList = useCallback(() => {
     if (!listId) {
@@ -53,27 +52,15 @@ export function ListPage() {
 
   return (
     <section className="space-y-6 py-8">
-      <header className="space-y-2">
-        <Link to="/" className="text-sm font-semibold text-emerald-700 hover:text-emerald-600">
-          ← Create another list
-        </Link>
+      <header>
         <h1 className="text-3xl font-black tracking-tight text-slate-900">{listQuery.data.name}</h1>
-        <div className="flex items-center gap-2 text-sm text-slate-600">
-          <span>Share URL: <span className="font-mono text-slate-800">{shareUrl}</span></span>
-          <button
-            type="button"
-            onClick={() => {
-              navigator.clipboard.writeText(shareUrl);
-              setCopied(true);
-              setTimeout(() => setCopied(false), 2000);
-            }}
-            className="rounded-md bg-emerald-700 px-3 py-1 text-xs font-semibold text-white hover:bg-emerald-600"
-          >
-            {copied ? "Copied!" : "Copy"}
-          </button>
-        </div>
-        <p className="text-xs uppercase tracking-wider text-slate-500">Socket {socket.connected ? "connected" : "connecting"}</p>
       </header>
+
+      {!socket.connected && (
+        <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
+          Connection lost — changes may not be saved. Trying to reconnect…
+        </div>
+      )}
 
       <ListView
         rows={listQuery.data.rows}
@@ -82,6 +69,8 @@ export function ListPage() {
         onDeleteRow={socket.deleteRow}
         onReorderRows={socket.reorderRows}
       />
+
+      <p className="text-center font-mono text-xs text-slate-400">{shareUrl}</p>
     </section>
   );
 }

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { CreateList } from "../components/CreateList";
 import { createList } from "../lib/api";
+import { saveList } from "../lib/savedLists";
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export function HomePage() {
   const createListMutation = useMutation({
     mutationFn: (name: string) => createList(name),
     onSuccess: (list) => {
+      saveList(list.id, list.name);
       navigate(`/lists/${list.id}`);
     },
   });
