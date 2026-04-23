@@ -8,7 +8,8 @@ LABEL fly_launch_runtime="Node.js"
 WORKDIR /app
 
 ARG YARN_VERSION=1.22.21
-RUN npm install -g yarn@$YARN_VERSION --force
+ARG TYPESCRIPT_VERSION=5.8.3
+RUN npm install -g yarn@$YARN_VERSION typescript@$TYPESCRIPT_VERSION --force
 
 
 FROM base AS build

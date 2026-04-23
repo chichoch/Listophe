@@ -14,6 +14,46 @@ Listophe is a real-time collaborative list-sharing app. Create a list, share the
 - `backend/` Express API + Socket.IO server + Drizzle schema
 - `PLAN.md` modernization plan for this rewrite
 
+## Docker
+
+The Docker image builds the frontend, starts the backend, and serves the compiled frontend from the same server.
+
+Build the image:
+
+```bash
+docker build -t listophe .
+```
+
+Run the container on the app's default port:
+
+```bash
+docker run --rm -p 3000:3000 listophe
+```
+
+Then open `http://localhost:3000`.
+
+Persist SQLite data between container runs:
+
+```bash
+docker run --rm -p 3000:3000 -v "$(pwd)/data:/app/data" listophe
+```
+
+The app writes its SQLite database to `/app/data/listophe.db` by default.
+
+If you want the container to listen on a different port, set `PORT` and map the same port on the host:
+
+```bash
+docker run --rm -e PORT=8080 -p 8080:8080 listophe
+```
+
+Useful environment variables:
+
+- `PORT` — HTTP port for the backend and bundled frontend server. Defaults to `3000`.
+- `DATABASE_URL` — custom SQLite file path. Defaults to `/app/data/listophe.db`.
+- `CORS_ORIGIN` — comma-separated list of allowed origins for API and Socket.IO access.
+
+
+
 ## Quick Start
 
 1. Install dependencies:
